@@ -5,7 +5,6 @@ phases:
             docker: 18
     build:
         commands:
-            - apt-get install jq -y
             - ContainerName="todo"
             - ImageURI=$(cat imageDetail.json | jq -r '.ImageURI')
             - printf '[{"name":"CONTAINER_NAME","imageUri":"IMAGE_URI"}]' > imagedefinitions.json
