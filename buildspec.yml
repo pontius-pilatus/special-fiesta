@@ -1,27 +1,18 @@
 version: 0.2
-
 phases:
-  pre_build:
-    commands:
-      - echo Logging in to Amazon ECR...
-      - aws --version
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 593063176004.dkr.ecr.us-east-1.amazonaws.com
-      - REPOSITORY_URI=593063176004.dkr.ecr.us-east-1.amazonaws.com/demoapp
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=${COMMIT_HASH:=latest}
-  build:
-    commands:
-      - echo Build started on `date`
-      - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
-  post_build:
-    commands:
-      - echo Build completed on `date`
-      - echo Pushing the Docker images...
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo Writing image definitions file...
-      - printf '[{"name":"DemoAppContainer","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+    install:
+        runtime-versions:
+            docker: 18
+    build:
+        commands:
+            - apt-get install jq -y
+            - ContainerName="todo"
+            - ImageURI=$(cat imageDetail.json | jq -r '.ImageURI')
+            - printf '[{"name":"CONTAINER_NAME","imageUri":"IMAGE_URI"}]' > imagedefinitions.json
+            - sed -i -e "s|CONTAINER_NAME|$ContainerName|g" imagedefinitions.json
+            - sed -i -e "s|IMAGE_URI|$ImageURI|g" imagedefinitions.json
+            - cat imagedefinitions.json
+
 artifacts:
-    files: imagedefinitions.json
+    files:
+        - imagedefinitions.json
