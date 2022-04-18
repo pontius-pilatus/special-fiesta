@@ -1,0 +1,6 @@
+[
+  {
+    "name": "DemoAppContainer",
+    "imageUri": "593063176004.dkr.ecr.us-east-1.amazonaws.com/nginx:latest"
+  }
+]
